@@ -1,7 +1,15 @@
+import funciones
 import tkinter as tk
 
+padron = []
+
 def CrearPadron():
-    ...
+    WCrearPadron = tk.Toplevel(window)
+    FCantidad = tk.Entry(WCrearPadron, )
+    FCantidad.pack()
+    BTCrear = tk.Button(WCrearPadron, command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
+    BTCrear.pack()
+    print(padron)
 
 def InsertarCandidato():
     ...

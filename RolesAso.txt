@@ -1,0 +1,14 @@
+Presidencia
+Vicepresidencia
+Secretaría General
+Tesorería
+Vocalía General
+Vocalía de Finanzas
+Fiscal
+Secretaría Asuntos Académicos
+Secretaría Cultura y Deporte
+Secretaría Bienestar Estudiantil
+Secretaría Divulgación
+Secretaría Equidad de Género
+Secretaría Investigación, Cooperación y Extensión
+(Cargue en una tupla)
