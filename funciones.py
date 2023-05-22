@@ -2,7 +2,7 @@ import random
 import names
 import archivos
 
-DEBUG = False
+DEBUG = True
 
 def crearCedula(pPadron):
     cedulas = [persona[0] for persona in pPadron]
@@ -41,7 +41,9 @@ def crearPadron(pPadron, pCantidad):
             carnet = None
         voto = None
         candidato = None
-        print([cedula, nombre, sede, carrera, rol, detalleRol, carnet, voto, candidato]) if DEBUG else ""
+
+        if DEBUG:
+            print([cedula, nombre, sede, carrera, rol, detalleRol, carnet, voto, candidato])
         pPadron.append([cedula, nombre, sede, carrera, rol, detalleRol, carnet, voto, candidato])
     return pPadron
 

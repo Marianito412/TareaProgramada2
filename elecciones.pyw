@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter as tk
+import funciones
 
 raiz = Tk()
 raiz.title("Sistema electoral")
@@ -8,6 +9,15 @@ raiz.iconbitmap("logo-TEC.ico")
 raiz.resizable(False, False)
 raiz.geometry("650x600")
 
+padron = []
+
+def CrearPadron():
+    WCrearPadron = tk.Toplevel(raiz)
+    FCantidad = tk.Entry(WCrearPadron, )
+    FCantidad.pack()
+    BTCrear = tk.Button(WCrearPadron, command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
+    BTCrear.pack()
+    print(padron)
 
 def abrirReportes():
     reportes = tk.Toplevel()
@@ -76,13 +86,12 @@ def abrirReportes():
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=10, column=1, padx=15)
 
-
 # Ventana principal
 
 texto = Label(raiz, text="Elecciones de rectoria", bg="white", font=("Arial", 20))
 texto.grid(row=0, column=1, padx=200, pady=30)
 
-bPadron = Button(raiz, text="Crear padron", width=20, height=3, font=("Arial", 10), activebackground="lightpink",bg="lightblue")
+bPadron = Button(raiz, text="Crear padron", width=20, height=3, font=("Arial", 10), activebackground="lightpink",bg="lightblue", command=CrearPadron)
 bPadron.configure(cursor="hand2")
 bPadron.grid(row=1, column=1)
 

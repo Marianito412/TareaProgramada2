@@ -1,7 +1,10 @@
 import funciones
 import tkinter as tk
+import time
 
 padron = []
+
+lambda: print("hola")
 
 def CrearPadron():
     WCrearPadron = tk.Toplevel(window)
