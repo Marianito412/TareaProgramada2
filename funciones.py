@@ -45,7 +45,23 @@ def crearPadron(pPadron, pCantidad):
         if DEBUG:
             print([cedula, nombre, sede, carrera, rol, detalleRol, carnet, voto, candidato])
         pPadron.append([cedula, nombre, sede, carrera, rol, detalleRol, carnet, voto, candidato])
+    print(pPadron)
     return pPadron
+
+def insertarCandidato(pPadron, pCedula):
+    candidatos=[]
+    flag=False
+    for i in pPadron:
+        if pCedula==i[0]:
+            flag=True
+            nombre=(f"{i[1][0]} {i[1][1]} {i[1][2]}")
+            periodo="2022-2024"
+            candidatos.append(pCedula)
+            candidatos.append(nombre)
+            candidatos.append(periodo)
+    if flag==False:
+         print("Esta persona no esta en el padron") 
+    return candidatos
 
 if __name__ == "__main__":
     crearPadron([], 10)

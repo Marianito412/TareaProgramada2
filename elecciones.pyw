@@ -86,6 +86,51 @@ def abrirReportes():
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=10, column=1, padx=15)
 
+def candidatos():
+    candidatos = tk.Toplevel()
+    candidatos.title("Candidatos")
+    candidatos.configure(bg="white")
+    candidatos.iconbitmap("logo-TEC.ico")
+    candidatos.resizable(False, False)
+    candidatos.geometry("540x500")
+    frame = Frame(candidatos, width=100, height=100, bg="white")
+    frame.grid(row=0, column=0, padx=5, pady=20)
+
+    texto = Label(frame, text="Candidatos:", bg="white", font=("Arial", 15))
+    texto.grid(row=0, column=0, padx=15, pady=10)
+
+    texto = Label(raiz, text="", bg="white")
+    texto.grid(row=1, column=0)
+
+    textoCedula = Label(candidatos,pady=15, text="Cédula", bg="white", font=("Arial", 10))
+    textoCedula.grid(row=1, column=1)
+
+    cedula = Entry(candidatos)
+    cedula.grid(row=1, column=2, padx=40)
+    print(padron)
+    print(cedula.get())
+
+    def buscarCandidato():
+        resultado = funciones.insertarCandidato(padron, cedula.get())
+    
+    bBuscar = Button(candidatos, text="Buscar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue",command=buscarCandidato)
+    bBuscar.configure(cursor="hand2")
+    bBuscar.grid(row=2, column=2)
+
+    texto = Label(candidatos, text="", bg="white")
+    texto.grid(row=3, column=0)
+
+    textoNombre = Label(candidatos,pady=15, text="Nombre", bg="white", font=("Arial", 10))
+    textoNombre.grid(row=4, column=1)   
+    
+    lecturaNombre= Text(candidatos,width=15, height=1)
+    lecturaNombre.grid(row=4, column=2)
+
+    texto = funciones.insertarCandidato(padron, cedula)[1]
+    lecturaNombre.insert("1.0", texto)
+
+    lecturaNombre.configure(state=DISABLED)
+
 # Ventana principal
 
 texto = Label(raiz, text="Elecciones de rectoria", bg="white", font=("Arial", 20))
@@ -95,7 +140,7 @@ bPadron = Button(raiz, text="Crear padron", width=20, height=3, font=("Arial", 1
 bPadron.configure(cursor="hand2")
 bPadron.grid(row=1, column=1)
 
-bCandidato = Button(raiz, text="Insertar candidato", width=20, height=3, font=("Arial", 10), activebackground="lightpink",bg="lightblue")
+bCandidato = Button(raiz, text="Insertar candidato", width=20, height=3, font=("Arial", 10), activebackground="lightpink",bg="lightblue", command=candidatos)
 bCandidato.configure(cursor="hand2")
 bCandidato.grid(row=3, column=1)
 
