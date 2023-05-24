@@ -156,6 +156,7 @@ def candidatos():
         if flag:
             periodo.delete(0, tk.END)
             periodo.configure(state=tk.NORMAL)
+            activar()
         else:
             periodo.delete(0, tk.END)
             periodo.configure(state=tk.DISABLED)
@@ -210,6 +211,19 @@ def candidatos():
     bLimpiar = Button(candidatos, text="Limpiar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue",command=limpiarDatos)
     bLimpiar.configure(cursor="hand2")
     bLimpiar.grid(row=12, column=1)
+
+    cedula.get()
+    
+
+    bRegistrar = Button(candidatos, text="Registrar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue")
+    bRegistrar.configure(cursor="hand2")
+    bRegistrar.grid(row=12, column=2)
+    bRegistrar.configure(state=tk.DISABLED)
+
+    def activar():
+        if periodo.get()!="":
+            bRegistrar.configure(state=tk.NORMAL)
+        
     
 # Ventana principal
 
