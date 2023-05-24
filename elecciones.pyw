@@ -12,11 +12,32 @@ raiz.geometry("650x600")
 padron = []
 
 def CrearPadron():
-    WCrearPadron = tk.Toplevel(raiz)
-    FCantidad = tk.Entry(WCrearPadron, )
-    FCantidad.pack()
-    BTCrear = tk.Button(WCrearPadron, command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
-    BTCrear.pack()
+    Cpadron = tk.Toplevel()
+    Cpadron.title("Reportes")
+    Cpadron.configure(bg="white")
+    Cpadron.iconbitmap("logo-TEC.ico")
+    Cpadron.resizable(False, False)
+    Cpadron.geometry("400x200")
+
+    frame = Frame(Cpadron, width=100, height=100, bg="white")
+    frame.grid(row=0, column=0, pady=20)
+
+    texto = Label(frame, text="Padron:", bg="white", font=("Arial", 15))
+    texto.grid(row=0, column=0, pady=10)
+
+    texto = Label(Cpadron, text="", bg="white")
+    texto.grid(row=1, column=0)
+
+    textoPadron = Label(Cpadron,pady=15, text="Ingrese el numero de personas", bg="white", font=("Arial", 10),)
+    textoPadron.grid(row=1, column=0,padx=15)
+
+
+    FCantidad = Entry(Cpadron)
+    FCantidad.grid(row=1, column=2, padx=20)
+    
+    BTCrear = Button(Cpadron, text="Registrar",width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
+    BTCrear.configure(cursor="hand2")
+    BTCrear.grid(row=2, column=0)
     print(padron)
 
 def abrirReportes():
