@@ -13,11 +13,30 @@ padron = []
 
 def CrearPadron():
     WCrearPadron = tk.Toplevel(raiz)
-    FCantidad = tk.Entry(WCrearPadron, )
+    FCantidad = tk.Entry(WCrearPadron, width=20, font=("Arial", 10))
+    FCantidad.insert()
     FCantidad.pack()
-    BTCrear = tk.Button(WCrearPadron, command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
+    
+    BTCrear = tk.Button(WCrearPadron, text="Reportar Ganador", width=20, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
     BTCrear.pack()
+    
     print(padron)
+
+def reporteTotal():
+    repTotal = tk.Toplevel()
+    repTotal.title("Reportes")
+    repTotal.configure(bg="white")
+    repTotal.iconbitmap("logo-TEC.ico")
+    repTotal.resizable(False, False)
+    repTotal.geometry("540x500")
+
+    height = 5
+    width = 5
+    padron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+    for i, persona in enumerate(padron): #Rows
+        for j, atributo in enumerate(persona): #Columns
+            b = Entry(repTotal, text=f"{atributo}")
+            b.grid(row=i, column=j)
 
 def abrirReportes():
     reportes = tk.Toplevel()
@@ -72,7 +91,7 @@ def abrirReportes():
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=8, column=1, padx=15)
 
-    bReporteBD = Button(reportes, text="Reporte total de la BD", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bReporteBD = Button(reportes, text="Reporte total de la BD", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteTotal)
     bReporteBD.configure(cursor="hand2")
     bReporteBD.grid(row=9, column=1)
 
@@ -131,6 +150,12 @@ bSalir.grid(row=11, column=1)
 texto = Label(raiz, text="", bg="white")
 texto.grid(row=10, column=1, padx=15)
 
+#def updateButtons():
+#    print("hola")
+#    raiz.after(1000, updateButtons)
+
+#raiz.after(2000, lambda: print("hola"))
+#raiz.after(1000, updateButtons)
 raiz.mainloop()
 
 #Reportes

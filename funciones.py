@@ -2,7 +2,9 @@ import random
 import names
 import archivos
 
-DEBUG = True
+DEBUG = False
+
+codigosSedes = {}
 
 def crearCedula(pPadron):
     cedulas = [persona[0] for persona in pPadron]
@@ -19,7 +21,8 @@ def crearCarnet(pPadron, pSede):
             return int(carnet)
 
 def crearPadron(pPadron, pCantidad):
-    sedes = archivos.leerSedes()[0]
+    sedes, codigos = archivos.leerSedes()
+    codigosSedes = codigos
     rolesAso = archivos.leerAso()
     rolesAdm = archivos.leerAdm()
 
@@ -47,8 +50,24 @@ def crearPadron(pPadron, pCantidad):
         pPadron.append([cedula, nombre, sede, carrera, rol, detalleRol, carnet, voto, candidato])
     return pPadron
 
+def filtrarPadron(pPadron, pCriterios: list = []):
+    for persona in pPadron:
+        if all([criterio(persona) for criterio in pCriterios]):
+            yield persona
+
+def traducirCodigo(pCodigo):
+    return codigosSedes[pCodigo]
+
 if __name__ == "__main__":
-    crearPadron([], 10)
+    test = crearPadron([], 10)
+    codigosSedes = archivos.leerSedes()[1]
+    #[lambda x: x[4] == 1]
+    test = list(filtrarPadron(test))
+    test = sorted(test, key = lambda x: int(str(x[2])+str(x[3])))
+    for persona in test:    
+        print(persona[0], traducirCodigo(persona[2]), traducirCodigo(persona[3]))
+
+
         
         
 
