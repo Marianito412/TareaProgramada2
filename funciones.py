@@ -63,6 +63,8 @@ def insertarCandidato(pPadron, pCedula):
          print("Esta persona no esta en el padron") 
     return candidatos
 
+
+
 if __name__ == "__main__":
     crearPadron([], 10)
         
