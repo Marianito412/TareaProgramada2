@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 import funciones
+import re
 
 raiz = Tk()
 raiz.title("Sistema electoral")
@@ -158,6 +159,8 @@ def abrirReportes():
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=10, column=1, padx=15)
 
+
+
 def candidatos():
     candidatos = tk.Toplevel()
     candidatos.title("Candidatos")
@@ -180,11 +183,35 @@ def candidatos():
     cedula = Entry(candidatos)
     cedula.grid(row=1, column=2, padx=40)
 
+    def activarBotonBuscar(event):
+        print("gggg")
+        if validarCedula(cedula.get()):
+            bBuscar.configure(state=tk.NORMAL)
+        else:
+            bBuscar.configure(state=tk.DISABLED)
+    
+    cedula.bind("<KeyRelease>", activarBotonBuscar)
+
     periodo = None
     print(padron)
 
     varOpcion=IntVar()
     encontrado = False
+
+
+
+    def validarCedula(pCedula):
+        """
+        Funcionalidad: valida una cédula contra regex
+        Entradas:
+        -pCedula(str): la cedula a validar
+        Salidas:
+        -pCedula: la cédula si cumple con las validaciones
+        """
+        if re.match(r"^\d{1}-\d{4}-\d{4}$", pCedula):
+            return True
+        else:
+            return False
 
     def buscarCandidato():
         flag = False
@@ -208,6 +235,7 @@ def candidatos():
         lecturaNombre.configure(state=tk.DISABLED)
     
     bBuscar = Button(candidatos, text="Buscar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue",command=buscarCandidato)
+    bBuscar.configure(state=tk.DISABLED)    
     bBuscar.configure(cursor="hand2")
     bBuscar.grid(row=2, column=2)
 
@@ -291,16 +319,44 @@ def candidatos():
     bLimpiar.grid(row=12, column=1)
 
     cedula.get()
+
+    def proceso(pPadron,pCedula,pPeriodo):
+        print("a")
+        funciones.registrarCandidato(pPadron,pCedula,pPeriodo)
+        verificacion = tk.Toplevel()
+        verificacion.title("Verificacion")
+        verificacion.configure(bg="white")
+        verificacion.iconbitmap("logo-TEC.ico")
+        verificacion.resizable(False, False)
+        verificacion.geometry("300x150")
+        texto = Label(verificacion, text="Fue registrado con exito", bg="white", font=("Arial", 14))
+        texto.place(x=45, y=50)
+        limpiarDatos()
     
-    bRegistrar = Button(candidatos, text="Registrar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command= lambda: funciones.registrarCandidato(padron, cedula.get(), periodo.get()))
+    bRegistrar = Button(candidatos, text="Registrar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command=lambda: proceso(padron, cedula.get(), periodo.get()))
     bRegistrar.configure(cursor="hand2")
     bRegistrar.grid(row=12, column=2)
     bRegistrar.configure(state=tk.DISABLED)
 
+    def validarPeriodo(pPeriodo):
+        """
+        Funcionalidad: valida una cédula contra regex
+        Entradas:
+        -pCedula(str): la cedula a validar
+        Salidas:
+        -pCedula: la cédula si cumple con las validaciones
+        """
+        if re.match(r"^\d{4}-\d{4}$", pPeriodo):
+            return True
+        else:
+            return False
+
     def activar(event):
         print("Alooo")
-        if periodo.get()!="":
+        if validarPeriodo(periodo.get()):
             bRegistrar.configure(state=tk.NORMAL)
+        else:
+            bRegistrar.configure(state=tk.DISABLED)
         
     
 # Ventana principal
