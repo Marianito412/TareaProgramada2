@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter as tk
+from tkinter import ttk
 import funciones
 
 raiz = Tk()
@@ -39,6 +40,56 @@ def CrearPadron():
     BTCrear.configure(cursor="hand2")
     BTCrear.grid(row=2, column=0)
     print(padron)
+
+def reporteTotal():
+    columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
+
+    repTotal = tk.Toplevel()
+    repTotal.title("Reporte Total")
+    repTotal.configure(bg="white")
+    repTotal.iconbitmap("logo-TEC.ico")
+    repTotal.resizable(False, False)
+
+    tabla = ttk.Treeview(repTotal, columns=columnas, show='headings')
+    for columna in columnas:
+        tabla.heading(columna, text=columna)
+    
+    fPadron = padron
+    fPadron = sorted(fPadron, key = lambda x: int(str(x[2])+str(x[3])))
+
+    for persona in fPadron:
+        tabla.insert('', tk.END, values=funciones.sanitizarInfo(persona))
+        
+    tabla.grid(row=0,column=0, sticky="nsew")
+
+def generarTabla(pVentana, pLista, pColumnas):
+    tablaEstudiantes = ttk.Treeview(repTotal, columns=columnas, show='headings')
+    for columna in pColumnas:
+        tabla.heading(columna, text=columna)
+    for persona in funciones.filtrarPadron(fPadron, [lambda x: x[4] == 1]):
+        tablaEstudiantes.insert('', tk.END, values=funciones.sanitizarInfo(persona))
+    tablaEstudiantes.grid(row=0,column=0, sticky="nsew")
+
+def reporteRoles():
+    columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
+
+    repTotal = tk.Toplevel()
+    repTotal.title("Reporte por roles")
+    repTotal.configure(bg="white")
+    repTotal.iconbitmap("logo-TEC.ico")
+    repTotal.resizable(False, False)
+
+    fPadron = padron
+    fPadron = sorted(fPadron, key = lambda x: int(str(x[2])+str(x[3])))
+
+    tablaEstudiantes = ttk.Treeview(repTotal, columns=columnas, show='headings')
+    for columna in columnas:
+        tablaEstudiantes.heading(columna, text=columna)
+    for persona in funciones.filtrarPadron(fPadron, [lambda x: x[4] == 1]):
+        tablaEstudiantes.insert('', tk.END, values=funciones.sanitizarInfo(persona))
+    tablaEstudiantes.grid(row=0,column=0, sticky="nsew")
+
+    
 
 def abrirReportes():
     reportes = tk.Toplevel()
@@ -93,7 +144,7 @@ def abrirReportes():
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=8, column=1, padx=15)
 
-    bReporteBD = Button(reportes, text="Reporte total de la BD", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bReporteBD = Button(reportes, text="Reporte total de la BD", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteTotal)
     bReporteBD.configure(cursor="hand2")
     bReporteBD.grid(row=9, column=1)
 
@@ -128,6 +179,8 @@ def candidatos():
 
     cedula = Entry(candidatos)
     cedula.grid(row=1, column=2, padx=40)
+
+    periodo = None
     print(padron)
 
     varOpcion=IntVar()
@@ -135,7 +188,7 @@ def candidatos():
 
     def buscarCandidato():
         flag = False
-        periodo(flag)
+        generarPeriodo(flag)
         lecturaNombre.configure(state=tk.NORMAL)  # Habilitar el modo de edición
         lecturaNombre.delete("1.0", tk.END)
         print(cedula.get())
@@ -167,17 +220,21 @@ def candidatos():
     lecturaNombre= Text(candidatos,width=26, height=2)
     lecturaNombre.grid(row=4, column=2)
 
-    def periodo(flag):
+    
+
+    def generarPeriodo(flag):
         textoPeriodo = Label(candidatos, pady=15, text="Periodo", bg="white", font=("Arial", 10))
         textoPeriodo.grid(row=10, column=1)
+        nonlocal periodo
         periodo = Entry(candidatos)
+        periodo.bind("<KeyRelease>", activar)
         periodo.grid(row=10, column=2, padx=40)
         periodo.configure(state=tk.NORMAL)
         periodo.delete(0, tk.END)
         if flag:
             periodo.delete(0, tk.END)
             periodo.configure(state=tk.NORMAL)
-            activar()
+            #activar()
         else:
             periodo.delete(0, tk.END)
             periodo.configure(state=tk.DISABLED)
@@ -186,14 +243,14 @@ def candidatos():
         if varOpcion.get() == 1:
             print("Si")
             flag = True
-            periodo(flag)
+            generarPeriodo(flag)
         elif varOpcion.get() == 2:
             print("No")
             flag = False
-            periodo(flag)
+            generarPeriodo(flag)
         else:
             flag = False
-            periodo(flag)
+            generarPeriodo(flag)
 
     def opcion(encontrado):
         Label(candidatos, text="", bg="white").grid(row=5, column=2)
@@ -212,13 +269,13 @@ def candidatos():
         else:
             varOpcion.set(0)
             flag = False
-            periodo(flag)
+            generarPeriodo(flag)
             rbSi.configure(state=tk.DISABLED)
             rbNo.configure(state=tk.DISABLED)
 
     def limpiarDatos():
         flag = False
-        periodo(flag)
+        generarPeriodo(flag)
         lecturaNombre.configure(state=tk.NORMAL)  # Habilitar el modo de edición
         lecturaNombre.delete("1.0", tk.END)
         lecturaNombre.configure(state=tk.DISABLED)
@@ -235,13 +292,13 @@ def candidatos():
 
     cedula.get()
     
-
-    bRegistrar = Button(candidatos, text="Registrar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue")
+    bRegistrar = Button(candidatos, text="Registrar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command= lambda: funciones.registrarCandidato(padron, cedula.get(), periodo.get()))
     bRegistrar.configure(cursor="hand2")
     bRegistrar.grid(row=12, column=2)
     bRegistrar.configure(state=tk.DISABLED)
 
-    def activar():
+    def activar(event):
+        print("Alooo")
         if periodo.get()!="":
             bRegistrar.configure(state=tk.NORMAL)
         
@@ -291,6 +348,12 @@ bSalir.grid(row=11, column=1)
 texto = Label(raiz, text="", bg="white")
 texto.grid(row=10, column=1, padx=15)
 
+#def updateButtons():
+#    print("hola")
+#    raiz.after(1000, updateButtons)
+
+#raiz.after(2000, lambda: print("hola"))
+#raiz.after(1000, updateButtons)
 raiz.mainloop()
 
 #Reportes

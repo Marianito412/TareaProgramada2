@@ -2,7 +2,11 @@ import random
 import names
 import archivos
 
-DEBUG = True
+DEBUG = False
+
+codigosSedes = {}
+
+codigosSedes = archivos.leerSedes()[1]
 
 def crearCedula(pPadron):
     cedulas = [persona[0] for persona in pPadron]
@@ -19,7 +23,8 @@ def crearCarnet(pPadron, pSede):
             return int(carnet)
 
 def crearPadron(pPadron, pCantidad):
-    sedes = archivos.leerSedes()[0]
+    sedes, codigos = archivos.leerSedes()
+    codigosSedes = codigos
     rolesAso = archivos.leerAso()
     rolesAdm = archivos.leerAdm()
 
@@ -48,6 +53,17 @@ def crearPadron(pPadron, pCantidad):
     print(pPadron)
     return pPadron
 
+def sanitizarInfo(pPersona):
+    return [pPersona[0], pPersona[1], traducirCodigo(pPersona[2]), traducirCodigo(pPersona[3]), ["Estudiante", "Docente", "Administrativo"][pPersona[4]-1], pPersona[5], pPersona[6], pPersona[7], pPersona[8]]
+
+def filtrarPadron(pPadron, pCriterios: list = []):
+    for persona in pPadron:
+        if all([criterio(persona) for criterio in pCriterios]):
+            yield persona
+
+def traducirCodigo(pCodigo):
+    return codigosSedes[pCodigo]
+
 def insertarCandidato(pPadron, pCedula):
     candidatos=[]
     flag=False
@@ -63,10 +79,21 @@ def insertarCandidato(pPadron, pCedula):
          print("Esta persona no esta en el padron") 
     return candidatos
 
-
+def registrarCandidato(pPadron, pCedula, pPeriodo):
+    for persona in pPadron:
+        if persona[0] == pCedula:
+            persona[-1] = pPeriodo
 
 if __name__ == "__main__":
-    crearPadron([], 10)
+    test = crearPadron([], 10)
+    
+    #[lambda x: x[4] == 1]
+    test = list(filtrarPadron(test))
+    test = sorted(test, key = lambda x: int(str(x[2])+str(x[3])))
+    for persona in test:    
+        print(persona[0], traducirCodigo(persona[2]), traducirCodigo(persona[3]))
+
+
         
         
 
