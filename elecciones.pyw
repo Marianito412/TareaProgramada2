@@ -331,6 +331,7 @@ def candidatos():
         verificacion.geometry("300x150")
         texto = Label(verificacion, text="Fue registrado con exito", bg="white", font=("Arial", 14))
         texto.place(x=45, y=50)
+        print(padron)
         limpiarDatos()
     
     bRegistrar = Button(candidatos, text="Registrar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command=lambda: proceso(padron, cedula.get(), periodo.get()))
@@ -357,7 +358,21 @@ def candidatos():
             bRegistrar.configure(state=tk.NORMAL)
         else:
             bRegistrar.configure(state=tk.DISABLED)
-        
+
+
+def procesoRector(pPadron):
+        print("a")
+        funciones.elegirRector(pPadron)
+        verificacionRector = tk.Toplevel()
+        verificacionRector.title("Verificacion")
+        verificacionRector.configure(bg="white")
+        verificacionRector.iconbitmap("logo-TEC.ico")
+        verificacionRector.resizable(False, False)
+        verificacionRector.geometry("300x150")
+        texto = Label(verificacionRector, text="Fue elegido con exito", bg="white", font=("Arial", 14))
+        texto.place(x=45, y=50)
+        print(padron)
+
     
 # Ventana principal
 
@@ -375,7 +390,7 @@ bCandidato.grid(row=3, column=1)
 texto = Label(raiz, text="", bg="white")
 texto.grid(row=2, column=1, padx=15)
 
-bRector = Button(raiz, text="Elegir rector(a)", width=20, height=3, font=("Arial", 10), activebackground="lightpink",bg="lightblue")
+bRector = Button(raiz, text="Elegir rector(a)", width=20, height=3, font=("Arial", 10), activebackground="lightpink",bg="lightblue",command=lambda: procesoRector(padron))
 bRector.configure(cursor="hand2")
 bRector.grid(row=5, column=1)
 

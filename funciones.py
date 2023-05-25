@@ -53,6 +53,20 @@ def crearPadron(pPadron, pCantidad):
     print(pPadron)
     return pPadron
 
+def elegirRector(pPadron):
+    candidatos=[]
+    for i in pPadron:
+        if i[8]!=None:
+            candidatos.append(i[0])
+    candidatos=tuple(candidatos)
+    print(candidatos)
+    for j in pPadron:
+        elegido = random.choice(candidatos)
+        print(elegido)
+        j[7]=elegido
+    return pPadron
+
+
 def sanitizarInfo(pPersona):
     return [pPersona[0], pPersona[1], traducirCodigo(pPersona[2]), traducirCodigo(pPersona[3]), ["Estudiante", "Docente", "Administrativo"][pPersona[4]-1], pPersona[5], pPersona[6], pPersona[7], pPersona[8]]
 
