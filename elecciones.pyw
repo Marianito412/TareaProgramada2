@@ -347,7 +347,6 @@ def candidatos():
             generarPeriodo(flag)
 
     def opcion(encontrado):
-        Label(candidatos, text="", bg="white").grid(row=5, column=2)
         Label(candidatos, text="Sera candidato?", bg="white", font=("Arial", 10)).grid(row=6, column=2)
         Label(candidatos, text="", bg="white").grid(row=7, column=2)
         rbSi = Radiobutton(candidatos, text="Si", variable=varOpcion, font=("Arial", 10), value=1, bg="white", command=imprimir)
@@ -375,6 +374,7 @@ def candidatos():
         lecturaNombre.configure(state=tk.DISABLED)
         varOpcion.set(0)
         cedula.delete(0, tk.END)
+        etiquetaPeriodo.config(text="",fg="gray")
 
 
     texto = Label(candidatos, text="", bg="white")
@@ -406,17 +406,24 @@ def candidatos():
         -pCedula: la cédula si cumple con las validaciones
         """
         if re.match(r"^\d{4}-\d{4}$", pPeriodo):
-            return True
+            if int(pPeriodo[:4])>int(pPeriodo[5:]):
+                return 2
+            else:
+                return 1
         else:
-            return False
+            return 3
 
     def activar(event):
         print("Alooo")
-        if validarPeriodo(periodo.get()):
+        etiquetaPeriodo.config(text="",fg="gray")
+        if validarPeriodo(periodo.get())==1:
             bRegistrar.configure(state=tk.NORMAL)
             etiquetaPeriodo.config(text="")
-        else:
+        elif validarPeriodo(periodo.get())==3:
             etiquetaPeriodo.config(text="Formato:0000-0000",fg="gray")
+            bRegistrar.configure(state=tk.DISABLED)
+        else:
+            etiquetaPeriodo.config(text="El primer año debe ser menor que el segundo",fg="gray")
             bRegistrar.configure(state=tk.DISABLED)
 
     etiquetaPeriodo=Label(candidatos,bg="white")
@@ -482,6 +489,16 @@ texto.grid(row=10, column=1, padx=15)
 #raiz.after(1000, updateButtons)
 #raiz.mainloop()
 
+def activarRector(pPadron,pBoton):
+    contador=0
+    for i in pPadron:
+        if i[8]!=None:
+            contador+=1
+    if contador>=2:
+        pBoton.configure(state=tk.NORMAL)
+    else:
+        pBoton.configure(state=tk.DISABLED)
+
 def activarInsertar(pBoton):
     if padron != []:
         pBoton.configure(state=tk.NORMAL)
@@ -493,6 +510,7 @@ while True:
     raiz.update_idletasks()
     #estado de botones
     activarInsertar(bCandidato)
+    activarRector(padron,bRector)
     
     raiz.update()
 
