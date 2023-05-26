@@ -7,6 +7,7 @@ DEBUG = False
 codigosSedes = {}
 
 codigosSedes = archivos.leerSedes()[1]
+codigoRoles = archivos.leerAdm
 
 def crearCedula(pPadron):
     cedulas = [persona[0] for persona in pPadron]
@@ -66,17 +67,27 @@ def elegirRector(pPadron):
         j[7]=elegido
     return pPadron
 
+def traducirCodigo(pCodigo):
+    return codigosSedes[pCodigo]
+
+def traducirDetalleRol(rol, detalleRol):
+    if rol == 3:
+        detalleRoles = archivos.leerAdm()
+    elif rol == 1:
+        detalleRoles = archivos.leerAso()
+    else:
+        return ""
+    return detalleRoles[detalleRol-1]
 
 def sanitizarInfo(pPersona):
-    return [pPersona[0], pPersona[1], traducirCodigo(pPersona[2]), traducirCodigo(pPersona[3]), ["Estudiante", "Docente", "Administrativo"][pPersona[4]-1], pPersona[5], pPersona[6], pPersona[7], pPersona[8]]
+    rol = ["Estudiante", "Docente", "Administrativo"][pPersona[4]-1]
+    detalleRol = traducirDetalleRol(pPersona[4], pPersona[5])
+    return [pPersona[0], pPersona[1], traducirCodigo(pPersona[2]), traducirCodigo(pPersona[3]), rol, detalleRol, pPersona[6], pPersona[7], pPersona[8]]
 
 def filtrarPadron(pPadron, pCriterios: list = []):
     for persona in pPadron:
         if all([criterio(persona) for criterio in pCriterios]):
             yield persona
-
-def traducirCodigo(pCodigo):
-    return codigosSedes[pCodigo]
 
 def insertarCandidato(pPadron, pCedula):
     candidatos=[]

@@ -11,4 +11,3 @@ Secretaría Bienestar Estudiantil
 Secretaría Divulgación
 Secretaría Equidad de Género
 Secretaría Investigación, Cooperación y Extensión
-(Cargue en una tupla)

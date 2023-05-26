@@ -16,10 +16,6 @@ def leerSedes():
 
 def leerAso():
     with open("RolesAso.txt", encoding="utf-8") as roles:
-        return tuple(roles.readlines())
-
-def leerAso():
-    with open("RolesAso.txt", encoding="utf-8") as roles:
         return tuple([rol.replace("\n", "") for rol in roles.readlines()])
 
 def leerAdm():

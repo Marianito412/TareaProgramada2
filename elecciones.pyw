@@ -69,11 +69,39 @@ def CrearPadron():
     BTCrear.configure(state=tk.DISABLED)
     print(padron)
 
+def generarTabla(pVentana, pLista, pColumnas, filtros=[]):
+    tablaEstudiantes = ttk.Treeview(pVentana, columns=pColumnas, show='headings')
+    for columna in pColumnas:
+        tablaEstudiantes.heading(columna, text=columna)
+    for persona in funciones.filtrarPadron(pLista, filtros):
+        tablaEstudiantes.insert('', tk.END, values=funciones.sanitizarInfo(persona))
+    #tablaEstudiantes.grid(row=0,column=0, sticky="nsew")
+    return tablaEstudiantes
 
+def reporteGanador():
 
+    repGanador = tk.Toplevel()
+    repGanador.title("Reporte Ganador")
+    repGanador.configure(bg="white")
+    repGanador.iconbitmap("logo-TEC.ico")
+    repGanador.resizable(False, True)
 
+    votacion = {}
+    for candidato in funciones.filtrarPadron(padron, [lambda x: x[-1] != None]):
+        votacion[candidato[0]] = 0
+    
+    for votante in padron:
+        if votante[-2] != None:
+            votacion[votante[-2]]+=1
+    tablaCandidatos = ttk.Treeview(repGanador, columns=("Candidato", "Votacion"), show="headings")
+    for columna in ("Candidato", "Votacion"):
+        tablaCandidatos.heading(columna, text=columna)
+    for candidato in votacion:
+        tablaCandidatos.insert("", tk.END, values=[candidato, votacion[candidato]])
 
-
+    #tablaCandidatos = generarTabla(repGanador, [[candidato, votacion[candidato]] for candidato in votacion], ("Candidato", "Votacion"))
+    tablaCandidatos.grid(row=0, column=0, sticky="nsew")
+    print(votacion)
 
 def reporteTotal():
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
@@ -83,47 +111,45 @@ def reporteTotal():
     repTotal.configure(bg="white")
     repTotal.iconbitmap("logo-TEC.ico")
     repTotal.resizable(False, False)
+    repTotal.grab_set()
 
-    tabla = ttk.Treeview(repTotal, columns=columnas, show='headings')
-    for columna in columnas:
-        tabla.heading(columna, text=columna)
-    
-    fPadron = padron
-    fPadron = sorted(fPadron, key = lambda x: int(str(x[2])+str(x[3])))
+    fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+    tablaTotal = generarTabla(repTotal, fPadron, columnas)
+    tablaTotal.grid(row=0, column=0, sticky="nsew")
 
-    for persona in fPadron:
-        tabla.insert('', tk.END, values=funciones.sanitizarInfo(persona))
-        
-    tabla.grid(row=0,column=0, sticky="nsew")
+def reporteAso():
+    columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
 
-def generarTabla(pVentana, pLista, pColumnas):
-    tablaEstudiantes = ttk.Treeview(repTotal, columns=columnas, show='headings')
-    for columna in pColumnas:
-        tabla.heading(columna, text=columna)
-    for persona in funciones.filtrarPadron(fPadron, [lambda x: x[4] == 1]):
-        tablaEstudiantes.insert('', tk.END, values=funciones.sanitizarInfo(persona))
-    tablaEstudiantes.grid(row=0,column=0, sticky="nsew")
+    repAso = tk.Toplevel()
+    repAso.title("Reporte Total")
+    repAso.configure(bg="white")
+    repAso.iconbitmap("logo-TEC.ico")
+    repAso.resizable(False, False)
+    repAso.grab_set()
+
+    fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+    tablaAso = generarTabla(repAso, fPadron, columnas, filtros=[lambda persona: persona[4] == 3])
+    tablaAso.grid(row=0, column=0, sticky="nsew")
+
+
 
 def reporteRoles():
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
 
-    repTotal = tk.Toplevel()
-    repTotal.title("Reporte por roles")
-    repTotal.configure(bg="white")
-    repTotal.iconbitmap("logo-TEC.ico")
-    repTotal.resizable(False, False)
+    repRoles = tk.Toplevel()
+    repRoles.title("Reporte por roles")
+    repRoles.configure(bg="white")
+    repRoles.iconbitmap("logo-TEC.ico")
+    repRoles.resizable(False, False)
 
-    fPadron = padron
-    fPadron = sorted(fPadron, key = lambda x: int(str(x[2])+str(x[3])))
+    fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
 
-    tablaEstudiantes = ttk.Treeview(repTotal, columns=columnas, show='headings')
-    for columna in columnas:
-        tablaEstudiantes.heading(columna, text=columna)
-    for persona in funciones.filtrarPadron(fPadron, [lambda x: x[4] == 1]):
-        tablaEstudiantes.insert('', tk.END, values=funciones.sanitizarInfo(persona))
-    tablaEstudiantes.grid(row=0,column=0, sticky="nsew")
-
-    
+    tablaEstudiantes = generarTabla(repRoles, fPadron, columnas, [lambda x: x[4]==1])
+    tablaEstudiantes.grid(row=0, column=0, sticky="nsew")
+    tablaDocentes = generarTabla(repRoles, fPadron, columnas, [lambda x: x[4]==2])
+    tablaDocentes.grid(row=1, column=0, sticky="nsew")
+    tablaAdmins = generarTabla(repRoles, fPadron, columnas, [lambda x: x[4]==3])
+    tablaAdmins.grid(row=2, column=0, sticky="nsew")
 
 def abrirReportes():
     reportes = tk.Toplevel()
@@ -137,14 +163,14 @@ def abrirReportes():
     texto = Label(reportes, text="Reportes", bg="white", font=("Arial", 20))
     texto.grid(row=0, column=1, padx=200, pady=30)
 
-    bGanador = Button(reportes, text="Reportar Ganador", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bGanador = Button(reportes, text="Reportar Ganador", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteGanador)
     bGanador.configure(cursor="hand2")
     bGanador.grid(row=1, column=1)
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=2, column=1, padx=15)
     
-    bRol = Button(reportes, text="Listado por rol", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bRol = Button(reportes, text="Listado por rol", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteRoles)
     bRol.configure(cursor="hand2")
     bRol.grid(row=3, column=1)
 
@@ -454,7 +480,21 @@ texto.grid(row=10, column=1, padx=15)
 
 #raiz.after(2000, lambda: print("hola"))
 #raiz.after(1000, updateButtons)
-raiz.mainloop()
+#raiz.mainloop()
+
+def activarInsertar(pBoton):
+    if padron != []:
+        pBoton.configure(state=tk.NORMAL)
+    else:
+        pBoton.configure(state=tk.DISABLED)
+
+while True:
+    #tk.tk.update_idletasks()
+    raiz.update_idletasks()
+    #estado de botones
+    activarInsertar(bCandidato)
+    
+    raiz.update()
 
 #Reportes
 
