@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import funciones
 import re
+from tkinter import messagebox
 
 raiz = Tk()
 raiz.title("Sistema electoral")
@@ -20,6 +21,7 @@ def CrearPadron():
     Cpadron.iconbitmap("logo-TEC.ico")
     Cpadron.resizable(False, False)
     Cpadron.geometry("400x200")
+    Cpadron.grab_set()
 
     frame = Frame(Cpadron, width=100, height=100, bg="white")
     frame.grid(row=0, column=0, pady=20)
@@ -35,12 +37,43 @@ def CrearPadron():
 
 
     FCantidad = Entry(Cpadron)
-    FCantidad.grid(row=1, column=2, padx=20)
+
+    def limpiarDatos2():
+        FCantidad.delete(0, tk.END)
+
+    def activarBotonCrear(event):
+        print("gggg")
+        if FCantidad.get().isdigit():
+            BTCrear.configure(state=tk.NORMAL)
+            etiquetaPadron.config(text="")
+        else:
+            etiquetaPadron.config(text="Debe digitar un número",fg="gray")
+            BTCrear.configure(state=tk.DISABLED)
+
+    etiquetaPadron=Label(Cpadron,bg="white")
+    etiquetaPadron.grid(row=2, column=2)
     
-    BTCrear = Button(Cpadron, text="Registrar",width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command=lambda: funciones.crearPadron(padron, int(FCantidad.get())))
+    FCantidad.bind("<KeyRelease>", activarBotonCrear)
+    
+    FCantidad.grid(row=1, column=2, padx=20)
+
+    def procesoPadron(padron,pNumero):
+        funciones.crearPadron(padron, int(pNumero))
+        messagebox.showinfo(title="Verificacion",message="Se ha creado con exito")
+        limpiarDatos2()
+        
+    
+    BTCrear = Button(Cpadron, text="Registrar",width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command=lambda: procesoPadron(padron, int(FCantidad.get())))
     BTCrear.configure(cursor="hand2")
-    BTCrear.grid(row=2, column=0)
+    BTCrear.grid(row=3, column=0)
+    BTCrear.configure(state=tk.DISABLED)
     print(padron)
+
+
+
+
+
+
 
 def reporteTotal():
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
@@ -99,6 +132,7 @@ def abrirReportes():
     reportes.iconbitmap("logo-TEC.ico")
     reportes.resizable(False, False)
     reportes.geometry("540x500")
+    reportes.grab_set()
 
     texto = Label(reportes, text="Reportes", bg="white", font=("Arial", 20))
     texto.grid(row=0, column=1, padx=200, pady=30)
@@ -168,6 +202,7 @@ def candidatos():
     candidatos.iconbitmap("logo-TEC.ico")
     candidatos.resizable(False, False)
     candidatos.geometry("540x500")
+    candidatos.grab_set()
     frame = Frame(candidatos, width=100, height=100, bg="white")
     frame.grid(row=0, column=0, padx=5, pady=20)
 
@@ -187,8 +222,13 @@ def candidatos():
         print("gggg")
         if validarCedula(cedula.get()):
             bBuscar.configure(state=tk.NORMAL)
+            etiquetaCedula.config(text="")
         else:
+            etiquetaCedula.config(text="Formato: 0-0000-0000",fg="gray")
             bBuscar.configure(state=tk.DISABLED)
+
+    etiquetaCedula=Label(candidatos,bg="white")
+    etiquetaCedula.grid(row=2, column=2)
     
     cedula.bind("<KeyRelease>", activarBotonBuscar)
 
@@ -237,16 +277,16 @@ def candidatos():
     bBuscar = Button(candidatos, text="Buscar", width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue",command=buscarCandidato)
     bBuscar.configure(state=tk.DISABLED)    
     bBuscar.configure(cursor="hand2")
-    bBuscar.grid(row=2, column=2)
+    bBuscar.grid(row=3, column=2)
 
     texto = Label(candidatos, text="", bg="white")
-    texto.grid(row=3, column=0)
+    texto.grid(row=4, column=0)
 
     textoNombre = Label(candidatos,pady=15,padx=18, text="Nombre", bg="white", font=("Arial", 10))
-    textoNombre.grid(row=4, column=1)   
+    textoNombre.grid(row=5, column=1)   
     
     lecturaNombre= Text(candidatos,width=26, height=2)
-    lecturaNombre.grid(row=4, column=2)
+    lecturaNombre.grid(row=5, column=2)
 
     
 
@@ -321,16 +361,8 @@ def candidatos():
     cedula.get()
 
     def proceso(pPadron,pCedula,pPeriodo):
-        print("a")
         funciones.registrarCandidato(pPadron,pCedula,pPeriodo)
-        verificacion = tk.Toplevel()
-        verificacion.title("Verificacion")
-        verificacion.configure(bg="white")
-        verificacion.iconbitmap("logo-TEC.ico")
-        verificacion.resizable(False, False)
-        verificacion.geometry("300x150")
-        texto = Label(verificacion, text="Fue registrado con exito", bg="white", font=("Arial", 14))
-        texto.place(x=45, y=50)
+        messagebox.showinfo(title="Verificacion",message="Se ha registrado el candidato con exito")
         print(padron)
         limpiarDatos()
     
@@ -356,21 +388,18 @@ def candidatos():
         print("Alooo")
         if validarPeriodo(periodo.get()):
             bRegistrar.configure(state=tk.NORMAL)
+            etiquetaPeriodo.config(text="")
         else:
+            etiquetaPeriodo.config(text="Formato:0000-0000",fg="gray")
             bRegistrar.configure(state=tk.DISABLED)
 
+    etiquetaPeriodo=Label(candidatos,bg="white")
+    etiquetaPeriodo.grid(row=11, column=2)
 
 def procesoRector(pPadron):
         print("a")
         funciones.elegirRector(pPadron)
-        verificacionRector = tk.Toplevel()
-        verificacionRector.title("Verificacion")
-        verificacionRector.configure(bg="white")
-        verificacionRector.iconbitmap("logo-TEC.ico")
-        verificacionRector.resizable(False, False)
-        verificacionRector.geometry("300x150")
-        texto = Label(verificacionRector, text="Fue elegido con exito", bg="white", font=("Arial", 14))
-        texto.place(x=45, y=50)
+        messagebox.showinfo(title="Verificacion",message="Fue elegido con exito")
         print(padron)
 
     
