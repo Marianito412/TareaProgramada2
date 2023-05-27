@@ -85,6 +85,7 @@ def reporteGanador():
     repGanador.configure(bg="white")
     repGanador.iconbitmap("logo-TEC.ico")
     repGanador.resizable(False, True)
+    repGanador.grab_set()
 
     votacion = {}
     for candidato in funciones.filtrarPadron(padron, [lambda x: x[-1] != None]):
@@ -131,8 +132,6 @@ def reporteAso():
     tablaAso = generarTabla(repAso, fPadron, columnas, filtros=[lambda persona: persona[4] == 3])
     tablaAso.grid(row=0, column=0, sticky="nsew")
 
-
-
 def reporteRoles():
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
 
@@ -141,6 +140,7 @@ def reporteRoles():
     repRoles.configure(bg="white")
     repRoles.iconbitmap("logo-TEC.ico")
     repRoles.resizable(False, False)
+    repRoles.grab_set()
 
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
 
@@ -218,8 +218,6 @@ def abrirReportes():
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=10, column=1, padx=15)
-
-
 
 def candidatos():
     candidatos = tk.Toplevel()
@@ -505,6 +503,7 @@ def activarInsertar(pBoton):
     else:
         pBoton.configure(state=tk.DISABLED)
 
+raiz.protocol("WM_DELETE_WINDOW", lambda: print(""))
 while True:
     #tk.tk.update_idletasks()
     raiz.update_idletasks()
