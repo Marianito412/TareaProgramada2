@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 import funciones
+import archivos
 import re
 from tkinter import messagebox
 
@@ -69,12 +70,12 @@ def CrearPadron():
     BTCrear.configure(state=tk.DISABLED)
     print(padron)
 
-def generarTabla(pVentana, pLista, pColumnas, filtros=[]):
+def generarTabla(pVentana, pLista, pColumnas, pSanitizar, filtros=[]):
     tablaEstudiantes = ttk.Treeview(pVentana, columns=pColumnas, show='headings')
     for columna in pColumnas:
         tablaEstudiantes.heading(columna, text=columna)
     for persona in funciones.filtrarPadron(pLista, filtros):
-        tablaEstudiantes.insert('', tk.END, values=funciones.sanitizarInfo(persona))
+        tablaEstudiantes.insert('', tk.END, values=pSanitizar(persona))
     #tablaEstudiantes.grid(row=0,column=0, sticky="nsew")
     return tablaEstudiantes
 
@@ -115,11 +116,13 @@ def reporteTotal():
     repTotal.grab_set()
 
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
-    tablaTotal = generarTabla(repTotal, fPadron, columnas)
+    tablaTotal = generarTabla(repTotal, fPadron, columnas, funciones.sanitizarInfo)
     tablaTotal.grid(row=0, column=0, sticky="nsew")
 
 def reporteAso():
-    columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
+    def prepararInfo(persona):
+        return[funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[6], persona[1], funciones.traducirDetalleRol(persona[4], persona[5])]
+    columnas = ("Sede", "Carrera", "Carnet", "Nombre", "Detalle del rol")
 
     repAso = tk.Toplevel()
     repAso.title("Reporte Total")
@@ -129,7 +132,7 @@ def reporteAso():
     repAso.grab_set()
 
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
-    tablaAso = generarTabla(repAso, fPadron, columnas, filtros=[lambda persona: persona[4] == 3])
+    tablaAso = generarTabla(repAso, fPadron, columnas, prepararInfo, filtros=[lambda persona: persona[4] == 1])
     tablaAso.grid(row=0, column=0, sticky="nsew")
 
 def reporteRoles():
@@ -144,12 +147,93 @@ def reporteRoles():
 
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
 
-    tablaEstudiantes = generarTabla(repRoles, fPadron, columnas, [lambda x: x[4]==1])
+    tablaEstudiantes = generarTabla(repRoles, fPadron, columnas, funciones.sanitizarInfo,[lambda x: x[4]==1])
     tablaEstudiantes.grid(row=0, column=0, sticky="nsew")
-    tablaDocentes = generarTabla(repRoles, fPadron, columnas, [lambda x: x[4]==2])
+    tablaDocentes = generarTabla(repRoles, fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4]==2])
     tablaDocentes.grid(row=1, column=0, sticky="nsew")
-    tablaAdmins = generarTabla(repRoles, fPadron, columnas, [lambda x: x[4]==3])
+    tablaAdmins = generarTabla(repRoles, fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4]==3])
     tablaAdmins.grid(row=2, column=0, sticky="nsew")
+
+def reporteSedes():
+
+    sedes, codigos = archivos.leerSedes()
+
+    def limpiarEntrada(persona):
+        return [funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[0], persona[1]]
+
+    columnas = ("Sede", "Carrera", "Cédula", "Nombre")
+
+    repSedes = tk.Toplevel()
+    repSedes.title("Reporte por cada sede")
+    repSedes.configure(bg="white")
+    repSedes.iconbitmap("logo-TEC.ico")
+    repSedes.resizable(True, True)
+    repSedes.grab_set()
+
+    numTabla = 0
+    for codigoSede in codigos:
+        if codigoSede in sedes.keys():
+            tabla = generarTabla(repSedes, padron, columnas, limpiarEntrada, [lambda x: x[2] == codigoSede])
+            tabla.grid(row=numTabla, column=0, sticky="nsew")
+            numTabla +=1
+
+def tablaRepSede(pSede):
+    columnas = ("Sede", "Carrera", "Cédula", "Nombre")
+
+    repSede = tk.Toplevel()
+    repSede.title("Reporte por sede")
+    repSede.configure(bg="white")
+    repSede.iconbitmap("logo-TEC.ico")
+    repSede.resizable(True, True)
+    repSede.grab_set()
+
+    tablaSede = generarTabla(repSede, padron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], x[1]], [lambda x: funciones.traducirCodigo(x[2])==pSede])
+    tablaSede.grid(row=0, column=0)
+
+def reporteSede():
+
+    repSede = tk.Toplevel()
+    repSede.title("Reporte por sede")
+    repSede.configure(bg="white")
+    repSede.iconbitmap("logo-TEC.ico")
+    repSede.resizable(True, True)
+    repSede.grab_set()
+
+    sedes, codigos = archivos.leerSedes()
+
+    opciones = [funciones.traducirCodigo(sede) for sede in sedes.keys()]
+    cajaOpciones= ttk.Combobox(repSede, values=opciones)
+    cajaOpciones.grid(row=0, column=0)
+    bConsultar = Button(repSede, text="Consultar", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda : tablaRepSede(cajaOpciones.get()))
+    bConsultar.grid(row=0,column=1)
+
+def tablaRepCarrera(pCarrera):
+    columnas = ("Sede", "Carrera", "Cédula", "Nombre")
+
+    repCarrera = tk.Toplevel()
+    repCarrera.title("Reporte por carrera")
+    repCarrera.configure(bg="white")
+    repCarrera.iconbitmap("logo-TEC.ico")
+    repCarrera.resizable(True, True)
+    repCarrera.grab_set()
+
+    tablaSede = generarTabla(repCarrera, padron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], x[1]], [lambda x: funciones.traducirCodigo(x[3])==pCarrera])
+    tablaSede.grid(row=0, column=0)
+
+def reporteCarrera():
+    repCarrera = tk.Toplevel()
+    repCarrera.title("Reporte por carrera")
+    repCarrera.configure(bg="white")
+    repCarrera.iconbitmap("logo-TEC.ico")
+    repCarrera.resizable(True, True)
+    repCarrera.grab_set()
+
+    sedes, codigos = archivos.leerSedes()
+    opciones = [funciones.traducirCodigo(carrera) for carreras in list(sedes.values()) for carrera in carreras]
+    cajaOpciones= ttk.Combobox(repCarrera, values=opciones)
+    cajaOpciones.grid(row=0, column=0)
+    bConsultar = Button(repCarrera, text="Consultar", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda : tablaRepCarrera(cajaOpciones.get()))
+    bConsultar.grid(row=0,column=1)
 
 def abrirReportes():
     reportes = tk.Toplevel()
@@ -157,7 +241,7 @@ def abrirReportes():
     reportes.configure(bg="white")
     reportes.iconbitmap("logo-TEC.ico")
     reportes.resizable(False, False)
-    reportes.geometry("540x500")
+    reportes.geometry("540x650")
     reportes.grab_set()
 
     texto = Label(reportes, text="Reportes", bg="white", font=("Arial", 20))
@@ -177,47 +261,47 @@ def abrirReportes():
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=2, column=1, padx=15)
 
-    bSede = Button(reportes, text="Padrón por cada sede", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bSede = Button(reportes, text="Padrón por cada sede", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteSedes)
     bSede.configure(cursor="hand2")
     bSede.grid(row=5, column=1)
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=4, column=1, padx=15)
 
-    bEstudiantil = Button(reportes, text="Padrón estudiantil por sede", width=20, height=2, font=("Arial", 10), activebackground="lightgreen", bg="lightblue")
+    bEstudiantil = Button(reportes, text="Padrón estudiantil por sede", width=20, height=2, font=("Arial", 10), activebackground="lightgreen", bg="lightblue", command=reporteSede)
     bEstudiantil.configure(cursor="hand2")
     bEstudiantil.grid(row=7, column=1)
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=6, column=1, padx=15)
 
-    bCarrera = Button(reportes, text="Padrón de votantes por carrera", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bCarrera = Button(reportes, text="Padrón de votantes por carrera", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteCarrera)
     bCarrera.configure(cursor="hand2")
     bCarrera.grid(row=9, column=1)
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=8, column=1, padx=15)
 
-    bAsociaciones = Button(reportes, text="Representantes de asociaciones", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue")
+    bAsociaciones = Button(reportes, text="Representantes de asociaciones", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteAso)
     bAsociaciones.configure(cursor="hand2")
-    bAsociaciones.grid(row=9, column=1)
-
-    texto = Label(reportes, text="", bg="white")
-    texto.grid(row=8, column=1, padx=15)
-
-    bReporteBD = Button(reportes, text="Reporte total de la BD", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteTotal)
-    bReporteBD.configure(cursor="hand2")
-    bReporteBD.grid(row=9, column=1)
-
-    texto = Label(reportes, text="", bg="white")
-    texto.grid(row=8, column=1, padx=15)
-
-    bSalir = Button(reportes, text="Salir", width=20, height=2, font=("Arial", 10), activebackground="lightgreen", bg="lightblue",command=reportes.destroy)
-    bSalir.configure(cursor="hand2")
-    bSalir.grid(row=11, column=1)
+    bAsociaciones.grid(row=11, column=1)
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=10, column=1, padx=15)
+
+    bReporteBD = Button(reportes, text="Reporte total de la BD", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteTotal)
+    bReporteBD.configure(cursor="hand2")
+    bReporteBD.grid(row=13, column=1)
+
+    texto = Label(reportes, text="", bg="white")
+    texto.grid(row=12, column=1, padx=15)
+
+    bSalir = Button(reportes, text="Salir", width=20, height=2, font=("Arial", 10), activebackground="lightgreen", bg="lightblue",command=reportes.destroy)
+    bSalir.configure(cursor="hand2")
+    bSalir.grid(row=15, column=1)
+
+    texto = Label(reportes, text="", bg="white")
+    texto.grid(row=14, column=1, padx=15)
 
 def candidatos():
     candidatos = tk.Toplevel()
@@ -472,7 +556,7 @@ bReportes.grid(row=9, column=1)
 texto = Label(raiz, text="", bg="white")
 texto.grid(row=8, column=1, padx=15)
 
-bSalir = Button(raiz, text="Salir", width=20, height=3, font=("Arial", 10), activebackground="lightpink", bg="lightblue")
+bSalir = Button(raiz, text="Salir", width=20, height=3, font=("Arial", 10), activebackground="lightpink", bg="lightblue", command=raiz.destroy)
 bSalir.configure(cursor="hand2")
 bSalir.grid(row=11, column=1)
 
