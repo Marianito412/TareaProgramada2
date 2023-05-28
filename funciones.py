@@ -82,7 +82,7 @@ def traducirDetalleRol(rol, detalleRol):
 def sanitizarInfo(pPersona):
     rol = ["Estudiante", "Docente", "Administrativo"][pPersona[4]-1]
     detalleRol = traducirDetalleRol(pPersona[4], pPersona[5])
-    return [pPersona[0], pPersona[1], traducirCodigo(pPersona[2]), traducirCodigo(pPersona[3]), rol, detalleRol, pPersona[6], pPersona[7], pPersona[8]]
+    return [pPersona[0], " ".join(pPersona[1]), traducirCodigo(pPersona[2]), traducirCodigo(pPersona[3]), rol, detalleRol, pPersona[6], pPersona[7], pPersona[8]]
 
 def filtrarPadron(pPadron, pCriterios: list = []):
     for persona in pPadron:
@@ -109,6 +109,41 @@ def registrarCandidato(pPadron, pCedula, pPeriodo):
         if persona[0] == pCedula:
             persona[-1] = pPeriodo
 
+def crearTag(pEtiqueta, pContenido, pAtributo=""):
+    """
+    Funcionalidad: Crea un string con formato html/xml válido
+    Entradas:
+    -pEtiqueta(str): El nombre de la etiqueta
+    -pContenido(str): El contenido de esa etiqueta
+    -pAtributo(str): Cualquier atributo deseado
+    """
+    pContenido = pContenido.replace("\n", "\n\t")
+    return f"<{pEtiqueta} {pAtributo}>\n\t{pContenido}\n</{pEtiqueta}>"
+
+def generarHTML(pPadron, pColumnas, limpiarAtributos, pFiltros):
+    plantilla = archivos.cargarTexto("static/index", ".html")
+    cabezeras = ""
+    for columna in pColumnas:
+        cabezeras+=crearTag("th", columna)
+    tabla=""
+    for persona in filtrarPadron(pPadron, pFiltros):
+        fila = ""
+        for atrubuto in limpiarAtributos(persona):
+            fila += crearTag("td", str(atrubuto))
+        fila=crearTag("tr", fila)
+        tabla+=fila
+    plantilla = plantilla.format(columnas = cabezeras, body=tabla)
+    print(plantilla)
+    return plantilla
+
+def determinarGanador(pVotacion):
+    votacion = sorted(list(pVotacion.items()), key= lambda x: x[1], reverse=True)
+    print(votacion[0])
+    if votacion[0][1] >= sum(candidato[1] for candidato in votacion)*0.4:
+        return f"Ganador: {votacion[0][0]}"
+    else:
+        return "Empate!"
+
 if __name__ == "__main__":
     test = crearPadron([], 10)
     
@@ -117,6 +152,7 @@ if __name__ == "__main__":
     test = sorted(test, key = lambda x: int(str(x[2])+str(x[3])))
     for persona in test:    
         print(persona[0], traducirCodigo(persona[2]), traducirCodigo(persona[3]))
+    generarHTML(test, ("Cédula", "Nombre", "Sede", "Carrera"), sanitizarInfo, [])
 
 
         

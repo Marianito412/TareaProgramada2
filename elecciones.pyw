@@ -93,16 +93,22 @@ def reporteGanador():
         votacion[candidato[0]] = 0
     
     for votante in padron:
-        if votante[-2] != None:
+        if votante[4] == 1:
+            votacion[votante[-2]]+=0.7
+        elif votante[4] == 2:
             votacion[votante[-2]]+=1
+        elif votante[4] == 3:
+            votacion[votante[-2]]+=0.33
+
     tablaCandidatos = ttk.Treeview(repGanador, columns=("Candidato", "Votacion"), show="headings")
     for columna in ("Candidato", "Votacion"):
         tablaCandidatos.heading(columna, text=columna)
     for candidato in votacion:
         tablaCandidatos.insert("", tk.END, values=[candidato, votacion[candidato]])
-
-    #tablaCandidatos = generarTabla(repGanador, [[candidato, votacion[candidato]] for candidato in votacion], ("Candidato", "Votacion"))
     tablaCandidatos.grid(row=0, column=0, sticky="nsew")
+    ganador = funciones.determinarGanador(votacion)
+    TGanador = ttk.Label(repGanador, text=ganador)
+    TGanador.grid(row=1, column=0)
     print(votacion)
 
 def reporteTotal():
@@ -119,9 +125,11 @@ def reporteTotal():
     tablaTotal = generarTabla(repTotal, fPadron, columnas, funciones.sanitizarInfo)
     tablaTotal.grid(row=0, column=0, sticky="nsew")
 
+    archivos.guardarTexto("reporteTotal", ".html", funciones.generarHTML(fPadron, columnas, funciones.sanitizarInfo, []))
+
 def reporteAso():
     def prepararInfo(persona):
-        return[funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[6], persona[1], funciones.traducirDetalleRol(persona[4], persona[5])]
+        return[funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[6], " ".join(persona[1]), funciones.traducirDetalleRol(persona[4], persona[5])]
     columnas = ("Sede", "Carrera", "Carnet", "Nombre", "Detalle del rol")
 
     repAso = tk.Toplevel()
@@ -134,6 +142,8 @@ def reporteAso():
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
     tablaAso = generarTabla(repAso, fPadron, columnas, prepararInfo, filtros=[lambda persona: persona[4] == 1])
     tablaAso.grid(row=0, column=0, sticky="nsew")
+
+    archivos.guardarTexto("reporteAso", ".html", funciones.generarHTML(fPadron, columnas, prepararInfo, [lambda persona: persona[4] == 1]))
 
 def reporteRoles():
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
@@ -149,17 +159,23 @@ def reporteRoles():
 
     tablaEstudiantes = generarTabla(repRoles, fPadron, columnas, funciones.sanitizarInfo,[lambda x: x[4]==1])
     tablaEstudiantes.grid(row=0, column=0, sticky="nsew")
+    archivos.guardarTexto("reporteEstudiantes", ".html", funciones.generarHTML(fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4] == 1]))
+
     tablaDocentes = generarTabla(repRoles, fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4]==2])
     tablaDocentes.grid(row=1, column=0, sticky="nsew")
+    archivos.guardarTexto("reporteDocentes", ".html", funciones.generarHTML(fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4] == 2]))
+
     tablaAdmins = generarTabla(repRoles, fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4]==3])
     tablaAdmins.grid(row=2, column=0, sticky="nsew")
+    archivos.guardarTexto("reporteAdministrativos", ".html", funciones.generarHTML(fPadron, columnas, funciones.sanitizarInfo, [lambda x: x[4] == 3]))
+
 
 def reporteSedes():
 
     sedes, codigos = archivos.leerSedes()
 
     def limpiarEntrada(persona):
-        return [funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[0], persona[1]]
+        return [funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[0], " ".join(persona[1])]
 
     columnas = ("Sede", "Carrera", "Cédula", "Nombre")
 
@@ -170,11 +186,14 @@ def reporteSedes():
     repSedes.resizable(True, True)
     repSedes.grab_set()
 
+    fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+
     numTabla = 0
     for codigoSede in codigos:
         if codigoSede in sedes.keys():
-            tabla = generarTabla(repSedes, padron, columnas, limpiarEntrada, [lambda x: x[2] == codigoSede])
+            tabla = generarTabla(repSedes, fPadron, columnas, limpiarEntrada, [lambda x: x[2] == codigoSede])
             tabla.grid(row=numTabla, column=0, sticky="nsew")
+            archivos.guardarTexto(funciones.traducirCodigo(codigoSede).replace(" ", "_"), ".html", funciones.generarHTML(fPadron, columnas, limpiarEntrada, [lambda x: x[2] == codigoSede]))
             numTabla +=1
 
 def tablaRepSede(pSede):
@@ -187,8 +206,12 @@ def tablaRepSede(pSede):
     repSede.resizable(True, True)
     repSede.grab_set()
 
+    fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+
     tablaSede = generarTabla(repSede, padron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], x[1]], [lambda x: funciones.traducirCodigo(x[2])==pSede])
     tablaSede.grid(row=0, column=0)
+    archivos.guardarTexto(f"RepSede{pSede}".replace(" ", "_"), ".html", 
+                          funciones.generarHTML(fPadron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], " ".join(x[1])], [lambda x: funciones.traducirCodigo(x[2])==pSede]))
 
 def reporteSede():
 
@@ -217,8 +240,12 @@ def tablaRepCarrera(pCarrera):
     repCarrera.resizable(True, True)
     repCarrera.grab_set()
 
+    fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+
     tablaSede = generarTabla(repCarrera, padron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], x[1]], [lambda x: funciones.traducirCodigo(x[3])==pCarrera])
     tablaSede.grid(row=0, column=0)
+    archivos.guardarTexto(f"RepSede{pCarrera}".replace(" ", "_"), ".html", 
+                          funciones.generarHTML(fPadron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], " ".join(x[1])], [lambda x: funciones.traducirCodigo(x[3])==pCarrera]))
 
 def reporteCarrera():
     repCarrera = tk.Toplevel()
