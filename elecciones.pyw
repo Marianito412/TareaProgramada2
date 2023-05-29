@@ -16,6 +16,9 @@ raiz.geometry("650x600")
 padron = []
 
 def CrearPadron():
+    """
+    Funcionalidad: Menú para crear una cantidad de personas e incluirlas en el padrón
+    """
     Cpadron = tk.Toplevel()
     Cpadron.title("Reportes")
     Cpadron.configure(bg="white")
@@ -71,6 +74,17 @@ def CrearPadron():
     print(padron)
 
 def generarTabla(pVentana, pLista, pColumnas, pSanitizar, filtros=[]):
+    """
+    Funcionalidad: Genera una tabla de TKinter con la forma especificada
+    Entradas:
+    -pVentana: La ventana en la que agregar la tabla
+    -pLista: La lista de personas a incluir en la tabla
+    -pColumnas: La lista de encabezados de la tabla
+    -pSanitizar: Una función que prepara cada elemento de pPadron para ser agregado a la tabla
+    -filtros: Lista de criterios a usar al recorrer el padrón
+    Salidas:
+    -tablaEstudiantes: Una referencia a la tabla generada
+    """
     tablaEstudiantes = ttk.Treeview(pVentana, columns=pColumnas, show='headings')
     for columna in pColumnas:
         tablaEstudiantes.heading(columna, text=columna)
@@ -80,7 +94,9 @@ def generarTabla(pVentana, pLista, pColumnas, pSanitizar, filtros=[]):
     return tablaEstudiantes
 
 def reporteGanador():
-
+    """
+    Funcinalidad: Muestra el ganador y el conteo de las votaciones
+    """
     repGanador = tk.Toplevel()
     repGanador.title("Reporte Ganador")
     repGanador.configure(bg="white")
@@ -112,6 +128,9 @@ def reporteGanador():
     print(votacion)
 
 def reporteTotal():
+    """
+    Funcionalidad: Muestar una tabla con la información de todas las personas de la base de datos
+    """
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
 
     repTotal = tk.Toplevel()
@@ -128,6 +147,9 @@ def reporteTotal():
     archivos.guardarTexto("reporteTotal", ".html", funciones.generarHTML(fPadron, columnas, funciones.sanitizarInfo, []))
 
 def reporteAso():
+    """
+    Funcionalidad: Muestra una tabla con todas las personas relacionadas a la asociación de estudiantes
+    """
     def prepararInfo(persona):
         return[funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[6], " ".join(persona[1]), funciones.traducirDetalleRol(persona[4], persona[5])]
     columnas = ("Sede", "Carrera", "Carnet", "Nombre", "Detalle del rol")
@@ -146,6 +168,9 @@ def reporteAso():
     archivos.guardarTexto("reporteAso", ".html", funciones.generarHTML(fPadron, columnas, prepararInfo, [lambda persona: persona[4] == 1]))
 
 def reporteRoles():
+    """
+    Funcionalidad: Muestar 3 tablas, una por cada tipo de rol en la unversidad
+    """
     columnas = ("Cédula", "Nombre", "Sede", "Carrera", "Rol", "Detalle de rol", "Carnet", "Voto", "Candidatura")
 
     repRoles = tk.Toplevel()
@@ -171,7 +196,9 @@ def reporteRoles():
 
 
 def reporteSedes():
-
+    """
+    Funcionalidad: Muestra una tabla por cada sede con la información de los estudiantes de esa sede
+    """
     sedes, codigos = archivos.leerSedes()
 
     def limpiarEntrada(persona):
@@ -197,6 +224,11 @@ def reporteSedes():
             numTabla +=1
 
 def tablaRepSede(pSede):
+    """
+    Funcionalidad: Muestra una tabla con la información de la sede proveida
+    Entradas:
+    -pSede: El nombre de la sede cuyo reporte se desea
+    """
     columnas = ("Sede", "Carrera", "Cédula", "Nombre")
 
     repSede = tk.Toplevel()
@@ -214,7 +246,9 @@ def tablaRepSede(pSede):
                           funciones.generarHTML(fPadron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], " ".join(x[1])], [lambda x: funciones.traducirCodigo(x[2])==pSede]))
 
 def reporteSede():
-
+    """
+    Funcionalidad: Muestar un menú para poder solicitar un reporte de una sede específica
+    """
     repSede = tk.Toplevel()
     repSede.title("Reporte por sede")
     repSede.configure(bg="white")
@@ -231,6 +265,11 @@ def reporteSede():
     bConsultar.grid(row=0,column=1)
 
 def tablaRepCarrera(pCarrera):
+    """
+    Funcionalidad: Muestra una tabla con la información de la carrera proveida
+    Entradas:
+    -pSede: El nombre de la carrera cuyo reporte se desea
+    """
     columnas = ("Sede", "Carrera", "Cédula", "Nombre")
 
     repCarrera = tk.Toplevel()
@@ -248,6 +287,9 @@ def tablaRepCarrera(pCarrera):
                           funciones.generarHTML(fPadron, columnas, lambda x: [funciones.traducirCodigo(x[2]), funciones.traducirCodigo(x[3]), x[0], " ".join(x[1])], [lambda x: funciones.traducirCodigo(x[3])==pCarrera]))
 
 def reporteCarrera():
+    """
+    Funcionalidad: Muestar un menú para poder solicitar un reporte de una carrera específica
+    """
     repCarrera = tk.Toplevel()
     repCarrera.title("Reporte por carrera")
     repCarrera.configure(bg="white")
@@ -263,6 +305,9 @@ def reporteCarrera():
     bConsultar.grid(row=0,column=1)
 
 def abrirReportes():
+    """
+    Muestra un menú con acceso a todos los posibles reportes
+    """
     reportes = tk.Toplevel()
     reportes.title("Reportes")
     reportes.configure(bg="white")
