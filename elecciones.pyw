@@ -13,7 +13,7 @@ raiz.iconbitmap("logo-TEC.ico")
 raiz.resizable(False, False)
 raiz.geometry("650x600")
 
-padron = []
+padron = archivos.lee("padron")
 
 def CrearPadron():
     """
@@ -109,6 +109,8 @@ def reporteGanador():
         votacion[candidato[0]] = 0
     
     for votante in padron:
+        if votante[-1] == None:
+            return
         if votante[4] == 1:
             votacion[votante[-2]]+=0.7
         elif votante[4] == 2:
@@ -342,6 +344,14 @@ def abrirReportes():
     bGanador = Button(reportes, text="Reportar Ganador", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=reporteGanador)
     bGanador.configure(cursor="hand2")
     bGanador.grid(row=1, column=1)
+
+    if len(padron)==0:
+        bGanador.configure(state=tk.DISABLED)
+    for persona in padron:
+        if persona[-2] == None:
+            bGanador.configure(state=tk.DISABLED)
+            print("Disabled")
+            break
 
     texto = Label(reportes, text="", bg="white")
     texto.grid(row=2, column=1, padx=15)
@@ -633,7 +643,7 @@ bRector.grid(row=5, column=1)
 texto = Label(raiz, text="", bg="white")
 texto.grid(row=4, column=1, padx=15)
 
-bDB = Button(raiz, text="Respaldar BD", width=20, height=3, font=("Arial", 10), activebackground="lightpink", bg="lightblue")
+bDB = Button(raiz, text="Respaldar BD", width=20, height=3, font=("Arial", 10), activebackground="lightpink", bg="lightblue", command= lambda: archivos.graba("padron", padron))
 bDB.configure(cursor="hand2")
 bDB.grid(row=7, column=1)
 
@@ -666,7 +676,11 @@ texto.grid(row=10, column=1, padx=15)
 #raiz.after(1000, updateButtons)
 #raiz.mainloop()
 
-
+def activarCrearPadron():
+    if padron != []:
+        bPadron.configure(state=tk.DISABLED)
+    else:
+        bPadron.configure(state=tk.NORMAL)
 
 def activarRector(pPadron,pBoton):
     contador=0
@@ -690,6 +704,7 @@ while True:
     if raiz.winfo_exists():
         raiz.update_idletasks()
         #estado de botones
+        activarCrearPadron()
         activarInsertar(bCandidato)
         activarRector(padron,bRector)
 
