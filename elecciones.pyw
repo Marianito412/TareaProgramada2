@@ -66,7 +66,6 @@ def CrearPadron():
         messagebox.showinfo(title="Verificacion",message="Se ha creado con exito")
         limpiarDatos2()
         
-    
     BTCrear = Button(Cpadron, text="Registrar",width=8, height=1, font=("Arial", 8), activebackground="lightpink",bg="lightblue", command=lambda: procesoPadron(padron, int(FCantidad.get())))
     BTCrear.configure(cursor="hand2")
     BTCrear.grid(row=3, column=0)
@@ -85,6 +84,7 @@ def generarTabla(pVentana, pLista, pColumnas, pSanitizar, filtros=[]):
     Salidas:
     -tablaEstudiantes: Una referencia a la tabla generada
     """
+    
     tablaEstudiantes = ttk.Treeview(pVentana, columns=pColumnas, show='headings')
     for columna in pColumnas:
         tablaEstudiantes.heading(columna, text=columna)
@@ -101,7 +101,7 @@ def reporteGanador():
     repGanador.title("Reporte Ganador")
     repGanador.configure(bg="white")
     repGanador.iconbitmap("logo-TEC.ico")
-    repGanador.resizable(False, True)
+    repGanador.resizable(True, True)
     repGanador.grab_set()
 
     votacion = {}
@@ -137,11 +137,15 @@ def reporteTotal():
     repTotal.title("Reporte Total")
     repTotal.configure(bg="white")
     repTotal.iconbitmap("logo-TEC.ico")
-    repTotal.resizable(False, False)
+    repTotal.resizable(True, True)
     repTotal.grab_set()
 
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
+    scroll = ttk.Scrollbar(repTotal, orient=tk.HORIZONTAL)
     tablaTotal = generarTabla(repTotal, fPadron, columnas, funciones.sanitizarInfo)
+    scroll.configure(command = tablaTotal.xview)
+    scroll.grid(row=1, column=0, sticky='ns')
+    tablaTotal.configure(xscrollcommand=scroll.set)
     tablaTotal.grid(row=0, column=0, sticky="nsew")
 
     archivos.guardarTexto("reporteTotal", ".html", funciones.generarHTML(fPadron, columnas, funciones.sanitizarInfo, []))
@@ -249,6 +253,13 @@ def reporteSede():
     """
     Funcionalidad: Muestar un menú para poder solicitar un reporte de una sede específica
     """
+
+    def activarBotonSede(event):
+        if event.widget.get() != "":
+            bConsultar.configure(state=tk.NORMAL)
+        else:
+            bConsultar.configure(state=tk.DISABLED)
+
     repSede = tk.Toplevel()
     repSede.title("Reporte por sede")
     repSede.configure(bg="white")
@@ -260,8 +271,9 @@ def reporteSede():
 
     opciones = [funciones.traducirCodigo(sede) for sede in sedes.keys()]
     cajaOpciones= ttk.Combobox(repSede, values=opciones)
+    cajaOpciones.bind("<<ComboboxSelected>>", activarBotonSede)
     cajaOpciones.grid(row=0, column=0)
-    bConsultar = Button(repSede, text="Consultar", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda : tablaRepSede(cajaOpciones.get()))
+    bConsultar = Button(repSede, text="Consultar", state=tk.DISABLED ,width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda : tablaRepSede(cajaOpciones.get()))
     bConsultar.grid(row=0,column=1)
 
 def tablaRepCarrera(pCarrera):
@@ -290,6 +302,13 @@ def reporteCarrera():
     """
     Funcionalidad: Muestar un menú para poder solicitar un reporte de una carrera específica
     """
+
+    def activarBotonCarrera(event):
+        if event.widget.get() != "":
+            bConsultar.configure(state=tk.NORMAL)
+        else:
+            bConsultar.configure(state=tk.DISABLED)
+
     repCarrera = tk.Toplevel()
     repCarrera.title("Reporte por carrera")
     repCarrera.configure(bg="white")
@@ -300,8 +319,9 @@ def reporteCarrera():
     sedes, codigos = archivos.leerSedes()
     opciones = [funciones.traducirCodigo(carrera) for carreras in list(sedes.values()) for carrera in carreras]
     cajaOpciones= ttk.Combobox(repCarrera, values=opciones)
+    cajaOpciones.bind("<<ComboboxSelected>>", activarBotonCarrera)
     cajaOpciones.grid(row=0, column=0)
-    bConsultar = Button(repCarrera, text="Consultar", width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda : tablaRepCarrera(cajaOpciones.get()))
+    bConsultar = Button(repCarrera, text="Consultar", state = tk.DISABLED, width=20, height=2, font=("Arial", 10), activebackground="lightgreen",bg="lightblue", command=lambda : tablaRepCarrera(cajaOpciones.get()))
     bConsultar.grid(row=0,column=1)
 
 def abrirReportes():
@@ -628,6 +648,9 @@ bReportes.grid(row=9, column=1)
 texto = Label(raiz, text="", bg="white")
 texto.grid(row=8, column=1, padx=15)
 
+def salir():
+    continuar=False
+
 bSalir = Button(raiz, text="Salir", width=20, height=3, font=("Arial", 10), activebackground="lightpink", bg="lightblue", command=raiz.destroy)
 bSalir.configure(cursor="hand2")
 bSalir.grid(row=11, column=1)
@@ -642,6 +665,8 @@ texto.grid(row=10, column=1, padx=15)
 #raiz.after(2000, lambda: print("hola"))
 #raiz.after(1000, updateButtons)
 #raiz.mainloop()
+
+
 
 def activarRector(pPadron,pBoton):
     contador=0
@@ -662,12 +687,13 @@ def activarInsertar(pBoton):
 raiz.protocol("WM_DELETE_WINDOW", lambda: print(""))
 while True:
     #tk.tk.update_idletasks()
-    raiz.update_idletasks()
-    #estado de botones
-    activarInsertar(bCandidato)
-    activarRector(padron,bRector)
-    
-    raiz.update()
+    if raiz.winfo_exists():
+        raiz.update_idletasks()
+        #estado de botones
+        activarInsertar(bCandidato)
+        activarRector(padron,bRector)
+
+        raiz.update()
 
 #Reportes
 
