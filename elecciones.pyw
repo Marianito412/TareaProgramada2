@@ -134,6 +134,7 @@ def reporteGanador():
     tablaCandidatos = ttk.Treeview(repGanador, columns=("Candidato", "Votacion"), show="headings")
     for columna in ("Candidato", "Votacion"):
         tablaCandidatos.heading(columna, text=columna)
+        tablaCandidatos.column(columna, width=10, stretch=False)
     for candidato in votacion:
         tablaCandidatos.insert("", tk.END, values=[candidato, votacion[candidato]])
     tablaCandidatos.grid(row=0, column=0, sticky="nsew")
@@ -158,8 +159,9 @@ def reporteTotal():
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
     scroll = ttk.Scrollbar(repTotal, orient=tk.HORIZONTAL)
     tablaTotal = generarTabla(repTotal, fPadron, columnas, funciones.sanitizarInfo)
+    repTotal.update_idletasks()
     scroll.configure(command = tablaTotal.xview)
-    scroll.grid(row=1, column=0, sticky='ns')
+    scroll.grid(row=1, column=0, sticky='nsew')
     tablaTotal.configure(xscrollcommand=scroll.set)
     tablaTotal.grid(row=0, column=0, sticky="nsew")
 
@@ -170,6 +172,13 @@ def reporteAso():
     Funcionalidad: Muestra una tabla con todas las personas relacionadas a la asociación de estudiantes
     """
     def prepararInfo(persona):
+        """
+        Funcionalidad: Genera una lista con el formato requerido para este reporte
+        Entradas:
+        -pPersona: La persona sobre la cual generar la lista
+        Salidas:
+        -return: La lista generada
+        """
         return[funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[6], " ".join(persona[1]), funciones.traducirDetalleRol(persona[4], persona[5])]
     columnas = ("Sede", "Carrera", "Carnet", "Nombre", "Detalle del rol")
 
@@ -221,6 +230,13 @@ def reporteSedes():
     sedes, codigos = archivos.leerSedes()
 
     def limpiarEntrada(persona):
+        """
+        Funcionalidad: Genera una lista con el formato requerido para este reporte
+        Entradas:
+        -pPersona: La persona sobre la cual generar la lista
+        Salidas:
+        -return: La lista generada
+        """
         return [funciones.traducirCodigo(persona[2]), funciones.traducirCodigo(persona[3]), persona[0], " ".join(persona[1])]
 
     columnas = ("Sede", "Carrera", "Cédula", "Nombre")
@@ -233,7 +249,7 @@ def reporteSedes():
     repSedes.grab_set()
 
     fPadron = sorted(padron, key = lambda x: int(str(x[2])+str(x[3])))
-
+    
     numTabla = 0
     for codigoSede in codigos:
         if codigoSede in sedes.keys():
@@ -268,8 +284,10 @@ def reporteSede():
     """
     Funcionalidad: Muestar un menú para poder solicitar un reporte de una sede específica
     """
-
     def activarBotonSede(event):
+        """
+        Funcionalidad: Activa el botón para buscar solo si la sede a buscar no es vacía
+        """
         if event.widget.get() != "":
             bConsultar.configure(state=tk.NORMAL)
         else:
@@ -317,8 +335,10 @@ def reporteCarrera():
     """
     Funcionalidad: Muestar un menú para poder solicitar un reporte de una carrera específica
     """
-
     def activarBotonCarrera(event):
+        """
+        Funcionalidad: Activa el botón para buscar solo si la carrera a buscar no es vacía
+        """
         if event.widget.get() != "":
             bConsultar.configure(state=tk.NORMAL)
         else:
