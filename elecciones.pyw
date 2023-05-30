@@ -114,7 +114,7 @@ def reporteGanador():
     repGanador.title("Reporte Ganador")
     repGanador.configure(bg="white")
     repGanador.iconbitmap("logo-TEC.ico")
-    repGanador.resizable(True, True)
+    repGanador.resizable(False, True)
     repGanador.grab_set()
 
     votacion = {}
@@ -123,7 +123,7 @@ def reporteGanador():
     
     for votante in padron:
         if votante[-1] == None:
-            return
+            continue
         if votante[4] == 1:
             votacion[votante[-2]]+=0.7
         elif votante[4] == 2:
@@ -134,7 +134,6 @@ def reporteGanador():
     tablaCandidatos = ttk.Treeview(repGanador, columns=("Candidato", "Votacion"), show="headings")
     for columna in ("Candidato", "Votacion"):
         tablaCandidatos.heading(columna, text=columna)
-        tablaCandidatos.column(columna, width=10, stretch=False)
     for candidato in votacion:
         tablaCandidatos.insert("", tk.END, values=[candidato, votacion[candidato]])
     tablaCandidatos.grid(row=0, column=0, sticky="nsew")
