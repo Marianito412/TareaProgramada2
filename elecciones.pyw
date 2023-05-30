@@ -43,10 +43,17 @@ def CrearPadron():
     FCantidad = Entry(Cpadron)
 
     def limpiarDatos2():
+        """
+        Funcionalidad: Elimina los datos en el entry FCantidad
+        """
         FCantidad.delete(0, tk.END)
 
     def activarBotonCrear(event):
-        print("gggg")
+        """
+        Funcionalidad: Activa el boton crear si los datos en el entry FCantidad cumplen los requisitos
+        Entradas:
+        -event: se recorre la funcion cada vez que hay un cambio
+        """
         if FCantidad.get().isdigit():
             BTCrear.configure(state=tk.NORMAL)
             etiquetaPadron.config(text="")
@@ -62,6 +69,12 @@ def CrearPadron():
     FCantidad.grid(row=1, column=2, padx=20)
 
     def procesoPadron(padron,pNumero):
+        """
+        Funcionalidad: Manda a la funcion de crear padron y muestra un messagebox
+        Entradas:
+        -pPadron: padron de personas
+        -pNumero: numero de personas a agregar
+        """
         funciones.crearPadron(padron, int(pNumero))
         messagebox.showinfo(title="Verificacion",message="Se ha creado con exito")
         limpiarDatos2()
@@ -406,6 +419,9 @@ def abrirReportes():
     texto.grid(row=14, column=1, padx=15)
 
 def candidatos():
+    """
+    Funcionalidad: Crea la ventana de insertar candidatos
+    """
     candidatos = tk.Toplevel()
     candidatos.title("Candidatos")
     candidatos.configure(bg="white")
@@ -429,7 +445,11 @@ def candidatos():
     cedula.grid(row=1, column=2, padx=40)
 
     def activarBotonBuscar(event):
-        print("gggg")
+        """
+        Funcionalidad: Activa el boton buscar que se usa para buscar la cedula en la matriz, solo se activa si esta en el formato correcto
+        Entradas:
+        -event: hace que se recorra la funcion cada vez que se toca una tecla
+        """
         if validarCedula(cedula.get()):
             bBuscar.configure(state=tk.NORMAL)
             etiquetaCedula.config(text="")
@@ -464,6 +484,9 @@ def candidatos():
             return False
 
     def buscarCandidato():
+        """
+        Funcionalidad: busca la cedula puesta en el entry en la matriz y pone un mensaje en la casilla 'nombre' segun el caso
+        """
         flag = False
         generarPeriodo(flag)
         lecturaNombre.configure(state=tk.NORMAL)  # Habilitar el modo de edición
@@ -501,6 +524,11 @@ def candidatos():
     
 
     def generarPeriodo(flag):
+        """
+        Funcionalidad: Activa el entry periodo cuando la flag ,que es la selecion de sera candidato, sea True
+        Entradas:
+        -flag(bool): se activa si se cumplen las condiciones 
+        """
         textoPeriodo = Label(candidatos, pady=15, text="Periodo", bg="white", font=("Arial", 10))
         textoPeriodo.grid(row=10, column=1)
         nonlocal periodo
@@ -518,6 +546,9 @@ def candidatos():
             periodo.configure(state=tk.DISABLED)
 
     def imprimir():
+        """
+        Funcionalidad: Controla los efectos si una de las casillas es seleccionada
+        """
         if varOpcion.get() == 1:
             print("Si")
             flag = True
@@ -531,6 +562,11 @@ def candidatos():
             generarPeriodo(flag)
 
     def opcion(encontrado):
+        """
+        Funcionalidad: Muestra los radiobbuton de sera candidato
+        Entradas:
+        -encontrado(bool): activa o desactiva los raddiobutton
+        """
         Label(candidatos, text="Sera candidato?", bg="white", font=("Arial", 10)).grid(row=6, column=2)
         Label(candidatos, text="", bg="white").grid(row=7, column=2)
         rbSi = Radiobutton(candidatos, text="Si", variable=varOpcion, font=("Arial", 10), value=1, bg="white", command=imprimir)
@@ -551,6 +587,9 @@ def candidatos():
             rbNo.configure(state=tk.DISABLED)
 
     def limpiarDatos():
+        """
+        Funcionalidad: Elimina los datos escritos de la GUI
+        """
         flag = False
         generarPeriodo(flag)
         lecturaNombre.configure(state=tk.NORMAL)  # Habilitar el modo de edición
@@ -571,6 +610,13 @@ def candidatos():
     cedula.get()
 
     def proceso(pPadron,pCedula,pPeriodo):
+        """
+        Funcionalidad: Manda a la funcion de registrar candidato y muestra un messagebox
+        Entradas:
+        -pPadron: padron de personas
+        -pCedula: cedula del candidato
+        -pPeriodo: periodo en que se postula el candidato
+        """
         funciones.registrarCandidato(pPadron,pCedula,pPeriodo)
         messagebox.showinfo(title="Verificacion",message="Se ha registrado el candidato con exito")
         print(padron)
@@ -598,7 +644,11 @@ def candidatos():
             return 3
 
     def activar(event):
-        print("Alooo")
+        """
+        Funcionalidad: activa el boton de registrar y activa un label que da una idea segun el caso
+        Entradas:
+        -event: se activa cada vez que hay un cambio
+        """
         etiquetaPeriodo.config(text="",fg="gray")
         if validarPeriodo(periodo.get())==1:
             bRegistrar.configure(state=tk.NORMAL)
@@ -614,6 +664,13 @@ def candidatos():
     etiquetaPeriodo.grid(row=11, column=2)
 
 def procesoRector(pPadron):
+        """
+        Funcionalidad: valida una cédula contra regex
+        Entradas:
+        -pCedula(str): la cedula a validar
+        Salidas:
+        -pCedula: la cédula si cumple con las validaciones
+        """
         print("a")
         funciones.elegirRector(pPadron)
         messagebox.showinfo(title="Verificacion",message="Fue elegido con exito")
@@ -659,6 +716,9 @@ texto = Label(raiz, text="", bg="white")
 texto.grid(row=8, column=1, padx=15)
 
 def salir():
+    """
+    Funcionalidad: Cambia el estado de la variable continuar
+    """
     continuar=False
 
 bSalir = Button(raiz, text="Salir", width=20, height=3, font=("Arial", 10), activebackground="lightpink", bg="lightblue", command=raiz.destroy)
@@ -677,12 +737,18 @@ texto.grid(row=10, column=1, padx=15)
 #raiz.mainloop()
 
 def activarCrearPadron():
+    """
+    Funcionalidad: Activa el boton de Crear Padron
+    """
     if padron != []:
         bPadron.configure(state=tk.DISABLED)
     else:
         bPadron.configure(state=tk.NORMAL)
 
 def activarRector(pPadron,pBoton):
+    """
+    Funcionalidad: Activa el boton de Elegir Rector
+    """
     contador=0
     for i in pPadron:
         if i[8]!=None:
@@ -693,6 +759,9 @@ def activarRector(pPadron,pBoton):
         pBoton.configure(state=tk.DISABLED)
 
 def activarInsertar(pBoton):
+    """
+    Funcionalidad: Activa el boton de Insertar Candidato
+    """
     if padron != []:
         pBoton.configure(state=tk.NORMAL)
     else:
