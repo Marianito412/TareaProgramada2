@@ -1,6 +1,13 @@
 import pickle
 
 def leerSedes():
+    """
+    Funcionalidad: Lee el archivo sedes y genera diccionario y codigos
+    Entradas: NA
+    Salidas:
+    -sedesDicc: Diccionario con sede como llave y lista de carreras como valor
+    -codigos: Diccionario con código como llave y texto como valor
+    """
     sedesDicc = {}
     codigos = {}
     with open("sedes.txt", encoding="utf-8") as sedes:
@@ -15,12 +22,22 @@ def leerSedes():
     return sedesDicc, codigos
 
 def leerAso():
+    """
+    Funcionalidad: Lee el archivo rolAso y genera una tupla
+    Entradas: NA
+    Salidas: Una tupla con los posibles roles de la aso
+    """
     with open("RolesAso.txt", encoding="utf-8") as roles:
-        return tuple([rol.replace("\n", "") for rol in roles.readlines()])
+        return tuple([rol.replace("\n", "") for rol in ["Representante estudiantil"]+roles.readlines()])
 
 def leerAdm():
+    """
+    Funcionalidad: Lee el archivo rolAdm y genera una lista
+    Entradas: NA
+    Salidas: Una lista con los posibles roles de la administración
+    """
     with open("rolAdm.txt", encoding="utf-8") as roles:
-        return [rol.replace("\n", "") for rol in ["Representante estudiantil"]+roles.readlines()]
+        return [rol.replace("\n", "") for rol in roles.readlines()]
 
 def guardarTexto(pNombre, pExtension, pContenido):
     """
