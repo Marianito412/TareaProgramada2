@@ -77,6 +77,13 @@ def crearPadron(pPadron, pCantidad):
     return pPadron
 
 def elegirRector(pPadron):
+    """
+    Funcionalidad: Genera votaciones por cada candidato y guarda el voto en su respectiva celda
+    Entradas:
+    -pPadron: La lista de votantes
+    Salidas:
+    -pPadron: La lista de vontantes actualizada
+    """
     candidatos=[]
     for i in pPadron:
         if i[8]!=None:
@@ -141,6 +148,14 @@ def filtrarPadron(pPadron, pCriterios: list = []):
             yield persona
 
 def insertarCandidato(pPadron, pCedula):
+    """
+    Funcionalidad: Registra una persona dada como candidato
+    Entradas:
+    -pPadron: La lista en la que buscar el posible candidato
+    -pCedula: La cédula del candidato a registrar
+    Salidas:
+    -candidatos: La Persona registrada como candidato
+    """
     candidatos=[]
     flag=False
     for i in pPadron:
@@ -156,6 +171,14 @@ def insertarCandidato(pPadron, pCedula):
     return candidatos
 
 def registrarCandidato(pPadron, pCedula, pPeriodo):
+    """
+    Funcionalidad: Registra una persona como candidato
+    Entradas:
+    -pPadron: La lista en la que buscar el posible candidato
+    -pCedula: La cédula del candidato a registrar
+    -pPeriodo: El periodo en el que se servirá
+    Salidas:NA
+    """
     for persona in pPadron:
         if persona[0] == pCedula:
             persona[-1] = pPeriodo
@@ -215,7 +238,6 @@ def determinarGanador(pVotacion):
 if __name__ == "__main__":
     test = crearPadron([], 10)
     
-    #[lambda x: x[4] == 1]
     test = list(filtrarPadron(test))
     test = sorted(test, key = lambda x: int(str(x[2])+str(x[3])))
     for persona in test:    
